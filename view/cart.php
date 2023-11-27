@@ -1,7 +1,7 @@
 <?php
+include('../config/pdo.php');
+include('../functions/common_functions.php');
 session_start();
-include('./config/pdo.php');
-include('./functions/common_functions.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +16,7 @@ include('./functions/common_functions.php');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- CSS File -->
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
@@ -25,7 +25,7 @@ include('./functions/common_functions.php');
 
         <nav class="navbar navbar-expand-lg navbar-light bg-info">
             <div class="container-fluid">
-                <img src="./images/dukhan.png" alt="" class="logo">
+                <img src="../images/dukhan.png" alt="" class="logo">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -39,10 +39,10 @@ include('./functions/common_functions.php');
                             <a class="nav-link" href="#">Products</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="./view/cart.php"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
+                            <a class="nav-link" href="#"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="./view/registration.php">Login/Register</a>
+                            <a class="nav-link" href="#">Login/Register</a>
                         </li>
 
                     </ul>
@@ -73,8 +73,8 @@ include('./functions/common_functions.php');
             <div class="row">
                 <!-- php code -->
                 <?php
-                getProducts();
-                getSearchProducts();
+                addProductToCart();
+                getCartItems();
                 ?>
             </div>
         </div>

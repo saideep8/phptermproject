@@ -1,6 +1,6 @@
 <?php
 include('../config/pdo.php');
-include('./functions/common_functions.php');
+include('../functions/common_functions.php');
 session_start();
 
 if (isset($_POST['add_product'])) {
@@ -26,7 +26,7 @@ if (isset($_POST['add_product'])) {
     } else {
         $pwd = dirname(getcwd(), 1);
         $file_destination = $pwd . '/images/product_images/' . $product_image_name;
-        $file_ext = explode('.', $product_name);
+        $file_ext = explode('.', $product_image_name);
         $file_actual_ext = strtolower(end($file_ext));
 
         $allowed = array('jpg', 'jpeg', 'png');
