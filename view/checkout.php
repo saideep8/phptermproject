@@ -1,8 +1,7 @@
 <?php
 session_start();
-include('../config/pdo.php');
-include('../functions/common_functions.php');
-
+include('./config/pdo.php');
+include('./functions/common_functions.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,21 +9,14 @@ include('../functions/common_functions.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details</title>
+    <title>Dukhan</title>
     <!-- Bootstrap link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- font awesome link -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- CSS File -->
-    <link rel="stylesheet" href="../css/product_details.css">
-    <style>
-        .img {
-            width: 100%;
-            height: 400px;
-            object-fit: contain;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
@@ -46,19 +38,15 @@ include('../functions/common_functions.php');
                         <li class="nav-item">
                             <a class="nav-link" href="#">Products</a>
                         </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" href="cart.php"><i class="fa-solid fa-cart-shopping"></i><sup></sup></a>
+                        </li> -->
                         <li class="nav-item">
-                            <a class="nav-link" href="cart.php"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? './view/logout.php' : './view/login.php'; ?>">
-                                <?php
-                                updateLoginLogout();
-                                ?>
-                            </a>
+                            <a class="nav-link" href="registration.php">Login/Register</a>
                         </li>
 
                     </ul>
-                    <form class="d-flex" action="../index.php" method="get">
+                    <form class="d-flex" action="index.php" method="get">
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search_data">
                         <input class="btn btn-outline-light" value="Search" type="submit" name="search_data_product">
                     </form>
@@ -69,12 +57,7 @@ include('../functions/common_functions.php');
         <nav class="navbar navbar-expand-lg navbar-light bg-secondary">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <!-- php code -->
-                        <?php
-                        updateWelcomeMessage();
-                        ?>
-                    </a>
+                    <a class="nav-link" href="#">Welcome Guest</a>
                 </li>
             </ul>
         </nav>
@@ -85,39 +68,22 @@ include('../functions/common_functions.php');
         </div>
     </div>
 
-    <!-- <div class="row px-1">
+    <div class="row px-1">
         <div class="col-md-12">
             <div class="row">
-
-                <div class="col-md-12">
-                    <div class='card position-absolute top-30 start-40'>
-                        <img src='../images/product_images/apple.jpeg' class='card-img-top' alt='$product_name'>
-                        <div class='card-body'>
-                            <h5 class='card-title'>$product_name</h5>
-                            <p class='card-text'>$product_description</p>
-                            <p class='card-text'>Price: $$price</p>
-                            <a href='#' class='btn btn-info'>Add to cart</a>
-                        </div>
-                    </div>
-                </div>
+                <!-- php code -->
+                <?php
+                unset($_SESSION['user_id']);
+                if (isset($_SESSION['user_id'])) {
+                    echo "inside...";
+                    echo $_SESSION['user_id'];
+                } else {
+                    include('login.php');
+                }
+                ?>
             </div>
         </div>
-    </div> -->
-    <?php
-    getProductDetails();
-    ?>
-
-    <!-- <div class="card text-center">
-
-        <div class="card-body">
-            <img src='../images/product_images/' class='card-img-top' alt='$product_name'>
-
-            <h5 class="card-title"></h5>
-            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
-
-    </div> -->
+    </div>
 
     <!-- bootstrap js link -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>

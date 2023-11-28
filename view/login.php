@@ -17,10 +17,16 @@ if (isset($_POST['user_login'])) {
         if (password_verify($password, $user_data['password'])) {
             $_SESSION['user_id'] = $user_data['user_id'];
             $_SESSION['email'] = $user_data['email'];
-            $_SESSION['user_firstname'] = $user_data['first_name'];
+            $_SESSION['firstname'] = $user_data['firstname'];
+            $_SESSION['lastname'] = $user_data['lastname'];
+            $_SESSION['register_as'] = $user_data['register_as'];
 
+            if ($_SESSION['register_as'] === "Customer") {
+                header("Location: ../index.php");
+            } else {
+                header("Location: ../seller/seller_index.php");
+            }
 
-            header("Location: ../index.php");
             exit();
         } else {
             $_SESSION['login_message'] = 'Incorrect password. Please try again.';

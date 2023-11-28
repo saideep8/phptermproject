@@ -1,5 +1,36 @@
 <?php
 
+//function to unset session variables
+function handleLoginLogoutClick()
+{
+    session_unset();
+    session_destroy();
+}
+
+//function to update welcome message 
+function updateWelcomeMessage()
+{
+    $user_firstname = isset($_SESSION['firstname']) ? $_SESSION['firstname'] : null;
+    $user_lastname = isset($_SESSION['lastname']) ? $_SESSION['lastname'] : null;
+    $welcome_message = "Welcome, Guest!";
+    if ($user_firstname !== null && $user_lastname !== null) {
+        $welcome_message = "Welcome, $user_firstname $user_lastname!";
+    }
+    echo $welcome_message;
+}
+
+//function to update login/logout text in home screen
+function updateLoginLogout()
+{
+    $user_firstname = isset($_SESSION['firstname']) ? $_SESSION['firstname'] : null;
+    $user_lastname = isset($_SESSION['lastname']) ? $_SESSION['lastname'] : null;
+    $login_logout_text = "Login/Register";
+    if ($user_firstname !== null && $user_lastname !== null) {
+        $login_logout_text = "Logout";
+    }
+    echo $login_logout_text;
+}
+
 //function to get form inputs and sanitize them
 function getFormValue($method, $form_id, $filter)
 {
@@ -29,7 +60,7 @@ function getProducts()
                             <h5 class='card-title'>$product_name</h5>
                             <p class='card-text'>$product_description</p>
                             <p class='card-text'>Price: $$price</p>
-                            <a href='./view/cart.php?cart=$product_id&userID=$userID' class='btn btn-info'>Add to cart</a>
+                            <a href='./view/cart.php?cart=$product_id' class='btn btn-info'>Add to cart</a>
                             <a href='./view/product_details.php?product_id=$product_id' class='btn btn-secondary'>View Details</a>
                         </div>
                     </div>
@@ -66,7 +97,7 @@ function getSearchProducts()
                                 <h5 class='card-title'>$product_name</h5>
                                 <p class='card-text'>$product_description</p>
                                 <p class='card-text'>Price: $$price</p>
-                                <a href='./view/cart.php?cart=$product_id&userID=$userID' class='btn btn-info'>Add to cart</a>
+                                <a href='./view/cart.php?cart=$product_id' class='btn btn-info'>Add to cart</a>
                                 <a href='./view/product_details.php?product_id=$product_id' class='btn btn-secondary'>View Details</a>
                             </div>
                         </div>
@@ -132,7 +163,7 @@ function getProductDetails()
                 <h5 class='text-start '>$seller_name</h5>
                 </div>
                 <div class='d-flex mx-2'>
-                <a href='cart.php?cart=$product_id&userID=$userID' class='btn btn-lg btn-info my-4'>Add to cart</a>
+                <a href='cart.php?cart=$product_id' class='btn btn-lg btn-info my-4'>Add to cart</a>
                 </div>
                 </div>
                 </div>
@@ -146,28 +177,37 @@ function getProductDetails()
 //Add product to cart implementation
 function addProductToCart()
 {
-    if (isset($_GET['cart']) and isset($_GET['userID'])) {
-        global $pdo;
-        $product_id = getFormValue(INPUT_GET, 'cart', FILTER_DEFAULT);
-        $userID = getFormValue(INPUT_GET, 'userID', FILTER_DEFAULT);
-        $select_query = "SELECT *
+    if (isset($_GET['cart'])) {
+
+        if (isset($_SESSION['user_id'])) {
+            global $pdo;
+            $product_id = getFormValue(INPUT_GET, 'cart', FILTER_DEFAULT);
+            $userID = $_SESSION['user_id'];
+            $select_query = "SELECT *
         FROM cart
         JOIN users ON cart.user_id = users.user_id
         JOIN products AS cart_products ON cart.product_id = cart_products.product_id
         WHERE cart_products.product_id = $product_id AND users.user_id = $userID;";
-        $stmt = $pdo->query($select_query);
-        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (sizeof($row) > 0) {
-            echo "<script>alert('This item is already in the cart')</script>";
-            echo "<script>window.open('../index.php', '_self')</script>";
-            // return;
-            // echo ("<p>This product is already in the cart</p>");
+            $stmt = $pdo->query($select_query);
+            $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (sizeof($row) > 0) {
+                echo "<script>alert('This item is already in the cart')</script>";
+                echo "<script>window.open('../index.php', '_self')</script>";
+                // return;
+                // echo ("<p>This product is already in the cart</p>");
+            } else {
+                $insertStmt = "INSERT into cart (user_id, product_id) values ($userID, $product_id)";
+                $stmt = $pdo->prepare($insertStmt);
+                $stmt->execute();
+                echo "<script>alert('You have successfully added the item into cart')</script>";
+                echo "<script>window.open('../index.php', '_self')</script>";
+            }
         } else {
-            $insertStmt = "INSERT into cart (user_id, product_id) values ($userID, $product_id)";
-            $stmt = $pdo->prepare($insertStmt);
-            $stmt->execute();
-            echo "<script>alert('You have successfully added the item into cart')</script>";
-            echo "<script>window.open('../index.php', '_self')</script>";
+            echo "<script>alert('Please login to add items into the cart.')</script>";
+            echo "<script>window.open('login.php', '_self')</script>";
+
+            // header('Location: login.php');
+            // exit();
         }
     }
 }
@@ -175,45 +215,47 @@ function addProductToCart()
 //number on cart
 function cartNumber()
 {
-    global $pdo;
-    $userID = $_SESSION['user_id'];
-    $select_query = "select * from cart where user_id = :userID";
-    $stmt =  $pdo->prepare($select_query);
-    $stmt->bindParam(':userID', $userID);
-    $stmt->execute();
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo sizeof($rows);
+    if (isset($_SESSION['user_id'])) {
+        global $pdo;
+        $userID = $_SESSION['user_id'];
+        $select_query = "select * from cart where user_id = :userID";
+        $stmt =  $pdo->prepare($select_query);
+        $stmt->bindParam(':userID', $userID);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo sizeof($rows);
+    }
 }
 
 //get cart items
 function getCartItems()
 {
-    // if (!isset($_GET['search_data_product'])) {
-    global $pdo;
-    $userID = $_SESSION['user_id'];
-    $item_prices = [];
-    $select_query = "SELECT product_id, cart_quantity from cart where user_id = :userID";
-    $stmt = $pdo->prepare($select_query);
-    $stmt->bindParam(':userID', $userID);
-    $stmt->execute();
-    $count = $stmt->rowCount();
-    if ($count > 0) {
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $product_id = $row['product_id'];
-            $quantity = $row['cart_quantity'];
-            $item_query = "SELECT * from products where product_id = :product_id";
-            $itemstmt = $pdo->prepare($item_query);
-            $itemstmt->bindParam(':product_id', $product_id);
-            $itemstmt->execute();
-            $res = $itemstmt->fetch(PDO::FETCH_ASSOC);
-            $product_name = $res['product_name'];
-            $product_description = $res['product_description'];
-            $img = $res['image'];
-            $price = $quantity * $res['price'];
-            $item_prices[] = $price;
-            $_SESSION['quantity'] = $res['quantity'];
-            $available = $_SESSION['quantity'] + 1;
-            echo ("
+    if (isset($_SESSION['user_id'])) {
+        global $pdo;
+        $userID = $_SESSION['user_id'];
+        $item_prices = [];
+        $select_query = "SELECT product_id, cart_quantity from cart where user_id = :userID";
+        $stmt = $pdo->prepare($select_query);
+        $stmt->bindParam(':userID', $userID);
+        $stmt->execute();
+        $count = $stmt->rowCount();
+        if ($count > 0) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $product_id = $row['product_id'];
+                $quantity = $row['cart_quantity'];
+                $item_query = "SELECT * from products where product_id = :product_id";
+                $itemstmt = $pdo->prepare($item_query);
+                $itemstmt->bindParam(':product_id', $product_id);
+                $itemstmt->execute();
+                $res = $itemstmt->fetch(PDO::FETCH_ASSOC);
+                $product_name = $res['product_name'];
+                $product_description = $res['product_description'];
+                $img = $res['image'];
+                $price = $quantity * $res['price'];
+                $item_prices[] = $price;
+                $_SESSION['quantity'] = $res['quantity'];
+                $available = $_SESSION['quantity'] + 1;
+                echo ("
         <div class='col-md-3 mb-2'>
                     <div class='card'>
                         <img src='../images/product_images/$img' class='card-img-top' alt='$product_name'>
@@ -232,14 +274,18 @@ function getCartItems()
                     </div>
                 </div>
                 ");
-        }
-        $total_price = array_sum($item_prices);
-        echo ("<form method='post' action='../index.php' class='text-center d-flex'>
+            }
+            $total_price = array_sum($item_prices);
+            echo ("<form method='post' action='../index.php' class='text-center d-flex'>
                             <h2 class='text-info text-center m-3'>Total price: $$total_price </h2>
                             <input type='submit' name='countinue_shopping' id='countinue_shopping' class='bg-info px-3 py-2 border-0 m-3' value='Continue Shopping'>
+                            <button class='bg-info px-3 py-2 border-0 m-3'><a href='checkout.php' class='text-dark text-decoration-none'>checkout</a></button>
                             </form>");
+        } else {
+            echo ("<h1 class='text-center text-danger'>You don't have any items in your cart!</h1>");
+        }
     } else {
-        echo ("<h1 class='text-center text-danger'>You don't have any items in your cart!</h1>");
+        include('../view/login.php');
     }
 }
 

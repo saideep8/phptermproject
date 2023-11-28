@@ -42,7 +42,11 @@ include('./functions/common_functions.php');
                             <a class="nav-link" href="./view/cart.php"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="./view/registration.php">Login/Register</a>
+                            <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? './view/logout.php' : './view/login.php'; ?>">
+                                <?php
+                                updateLoginLogout();
+                                ?>
+                            </a>
                         </li>
 
                     </ul>
@@ -57,7 +61,12 @@ include('./functions/common_functions.php');
         <nav class="navbar navbar-expand-lg navbar-light bg-secondary">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Welcome Guest</a>
+                    <a class="nav-link" href="#">
+                        <!-- php code -->
+                        <?php
+                        updateWelcomeMessage();
+                        ?>
+                    </a>
                 </li>
             </ul>
         </nav>
@@ -66,6 +75,7 @@ include('./functions/common_functions.php');
             <h3 class="text-center">Shop with Dukhan.</h3>
             <p class="text-center">Hassle free!</p>
         </div>
+
     </div>
 
     <div class="row px-1">

@@ -1,3 +1,9 @@
+<?php
+session_start();
+include('../config/pdo.php');
+include('../functions/common_functions.php');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,7 +28,12 @@
                 <nav class="navbar navbar-expand-lg">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a href="" class="nav-link">Welcome guest</a>
+                            <a href="" class="nav-link">
+                                <!-- php code -->
+                                <?php
+                                updateWelcomeMessage();
+                                ?>
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -44,7 +55,13 @@
                     <button><a href="../view/add_products.php" class="nav-link text-light bg-info my-1">Add products</a></button>
                     <button><a href="" class="nav-link text-light bg-info my-1">View products</a></button>
                     <button><a href="" class="nav-link text-light bg-info my-1">All orders</a></button>
-                    <button><a href="" class="nav-link text-light bg-info my-1">Log out</a></button>
+                    <button>
+                        <a class="nav-link text-light bg-info my-1" href="<?php echo isset($_SESSION['firstname']) ? '../view/logout.php' : '../view/login.php'; ?>">
+                            <?php
+                            updateLoginLogout();
+                            ?>
+                        </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -52,7 +69,6 @@
 
     <!-- bootstrap js link -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
 </body>
 
 </html>

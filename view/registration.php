@@ -11,6 +11,7 @@ if (isset($_POST['user_register'])) {
     $password = getFormValue(INPUT_POST, 'password', FILTER_DEFAULT);
     $confirm_password = getFormValue(INPUT_POST, 'confirm_password', FILTER_DEFAULT);
     $contact = getFormValue(INPUT_POST, 'contact', FILTER_SANITIZE_NUMBER_INT);
+    $register_as = getFormValue(INPUT_POST, 'register_as', FILTER_DEFAULT);
 
     // Validate email format
     if (!$email) {
@@ -21,14 +22,15 @@ if (isset($_POST['user_register'])) {
         $_SESSION['input_message'] = 'Password and Confirm Password do not match!';
     } else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $insert_query = "INSERT INTO users (firstname, lastname, email, password, contact) 
-                        VALUES (:firstname, :lastname, :email, :password, :contact)";
+        $insert_query = "INSERT INTO users (firstname, lastname, email, password, contact, register_as) 
+                        VALUES (:firstname, :lastname, :email, :password, :contact, :register_as)";
         $insert_stmt = $pdo->prepare($insert_query);
         $insert_stmt->bindParam(':firstname', $firstname);
         $insert_stmt->bindParam(':lastname', $lastname);
         $insert_stmt->bindParam(':email', $email);
         $insert_stmt->bindParam(':password', $hashed_password);
         $insert_stmt->bindParam(':contact', $contact);
+        $insert_stmt->bindParam(':register_as', $register_as);
         $query_result = $insert_stmt->execute();
         if ($query_result) {
             $_SESSION['input_message'] = 'User registered successfully!';
@@ -101,6 +103,15 @@ if (isset($_POST['user_register'])) {
                     <div class="form-outline mb-4">
                         <label for="contact" class="form-label">Contact</label>
                         <input type="tel" id="contact" name="contact" class="form-control" inputmode="numeric" pattern="[0-9]*" placeholder="Enter Your Mobile Number" autocomplete="off" required />
+                    </div>
+
+                    <div class="form-outline mb-4">
+                        <label for="register_as" class="form-label">Register As</label>
+                        <select id="register_as" name="register_as" class="form-control"  required>
+                            <option value="" selected disabled>Select an option</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Seller">Seller</option>
+                        </select>
                     </div>
 
                     <div class="mt-4 pt-2">
