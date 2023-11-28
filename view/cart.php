@@ -9,7 +9,7 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dukhan</title>
+    <title>Cart</title>
     <!-- Bootstrap link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- font awesome link -->
@@ -17,6 +17,13 @@ session_start();
 
     <!-- CSS File -->
     <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .quan {
+            width: 60px;
+            height: 30px;
+        }
+    </style>
 </head>
 
 <body>
@@ -46,7 +53,7 @@ session_start();
                         </li>
 
                     </ul>
-                    <form class="d-flex" action="index.php" method="get">
+                    <form class="d-flex" action="../index.php" method="get">
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search_data">
                         <input class="btn btn-outline-light" value="Search" type="submit" name="search_data_product">
                     </form>
@@ -74,7 +81,9 @@ session_start();
                 <!-- php code -->
                 <?php
                 addProductToCart();
+                removeFromCart();
                 getCartItems();
+                updateQuantityInCart();
                 ?>
             </div>
         </div>

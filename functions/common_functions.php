@@ -1,6 +1,4 @@
 <?php
-include('./config/pdo.php');
-session_start();
 
 //function to get form inputs and sanitize them
 function getFormValue($method, $form_id, $filter)
@@ -160,15 +158,6 @@ function addProductToCart()
         $stmt = $pdo->query($select_query);
         $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (sizeof($row) > 0) {
-            // echo ("<div class='toast' role='alert' aria-live='assertive' aria-atomic='true'>
-            //     <div class='toast-header'>
-            //       <strong class='me-auto text-danger'>Warning</strong>
-            //       <button type='button' class='btn-close' data-bs-dismiss='toast' aria-label='Close'></button>
-            //     </div>
-            //     <div class='toast-body'>
-            //       This product is already in the cart!
-            //     </div>
-            //   </div>");
             echo "<script>alert('This item is already in the cart')</script>";
             echo "<script>window.open('../index.php', '_self')</script>";
             // return;
@@ -178,7 +167,7 @@ function addProductToCart()
             $stmt = $pdo->prepare($insertStmt);
             $stmt->execute();
             echo "<script>alert('You have successfully added the item into cart')</script>";
-            // echo "<script>window.open('../index.php', '_self')</script>";
+            echo "<script>window.open('../index.php', '_self')</script>";
         }
     }
 }
@@ -203,53 +192,15 @@ function getCartItems()
     global $pdo;
     $userID = $_SESSION['user_id'];
     $item_prices = [];
-    $select_query = "SELECT product_id from cart where user_id = :userID";
+    $select_query = "SELECT product_id, cart_quantity from cart where user_id = :userID";
     $stmt = $pdo->prepare($select_query);
     $stmt->bindParam(':userID', $userID);
     $stmt->execute();
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $product_id = $row['product_id'];
-        $item_query = "SELECT * from products where product_id = :product_id";
-        $itemstmt = $pdo->prepare($item_query);
-        $itemstmt->bindParam(':product_id', $product_id);
-        $itemstmt->execute();
-        $res = $itemstmt->fetch(PDO::FETCH_ASSOC);
-        $product_name = $res['product_name'];
-        $product_description = $res['product_description'];
-        $img = $res['image'];
-        $price = $res['price'];
-        $item_prices[] = $price;
-        echo ("<div class='col-md-3 mb-2'>
-                    <div class='card'>
-                        <img src='../images/product_images/$img' class='card-img-top' alt='$product_name'>
-                        <div class='card-body'>
-                            <h5 class='card-title'>$product_name</h5>
-                            <p class='card-text'>$product_description</p>
-                            <p class='card-text'>Price: $$price</p>
-                            <a href='./view/product_details.php?product_id=$product_id' class='btn btn-secondary'>View Details</a>
-                        </div>
-                    </div>
-                </div>");
-    }
-
-    $total_price = array_sum($item_prices);
-    echo ("<h1 class='text-success text-center m-3'>Total price: $$total_price</h1>");
-    // }
-}
-
-//remove from cart
-function removeFromCart()
-{
-    if (isset($_GET['remove_cart'])) {
-        global $pdo;
-        $userID = $_SESSION['user_id'];
-        $item_prices = [];
-        $select_query = "SELECT product_id from cart where user_id = :userID";
-        $stmt = $pdo->prepare($select_query);
-        $stmt->bindParam(':userID', $userID);
-        $stmt->execute();
+    $count = $stmt->rowCount();
+    if ($count > 0) {
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $product_id = $row['product_id'];
+            $quantity = $row['cart_quantity'];
             $item_query = "SELECT * from products where product_id = :product_id";
             $itemstmt = $pdo->prepare($item_query);
             $itemstmt->bindParam(':product_id', $product_id);
@@ -258,20 +209,73 @@ function removeFromCart()
             $product_name = $res['product_name'];
             $product_description = $res['product_description'];
             $img = $res['image'];
-            $price = $res['price'];
+            $price = $quantity * $res['price'];
             $item_prices[] = $price;
-            echo ("<div class='col-md-3 mb-2'>
-                        <div class='card'>
-                            <img src='../images/product_images/$img' class='card-img-top' alt='$product_name'>
-                            <div class='card-body'>
-                                <h5 class='card-title'>$product_name</h5>
-                                <p class='card-text'>$product_description</p>
-                                <p class='card-text'>Price: $$price</p>
-                                <a href='./view/cart.php?cart=$product_id&userID=$userID' class='btn btn-info'>Add to cart</a>
-                                <a href='./view/product_details.php?product_id=$product_id' class='btn btn-secondary'>View Details</a>
-                            </div>
+            $_SESSION['quantity'] = $res['quantity'];
+            $available = $_SESSION['quantity'] + 1;
+            echo ("
+        <div class='col-md-3 mb-2'>
+                    <div class='card'>
+                        <img src='../images/product_images/$img' class='card-img-top' alt='$product_name'>
+                        <div class='card-body'>
+                            <h5 class='card-title'>$product_name</h5>
+                            <p class='card-text'>$product_description</p>
+                            <p class='card-text'>Price: $$price</p>
+                            <form method='post' action='cart.php?productID=$product_id&userID=$userID' class='d-flex'>
+                            <label for='quantity'>Quantity:</label>
+                            <input type='number' name='quantity' id='quantity' value='$quantity' class='quan mx-1 mb-3' min=1 autocomplete='off'>
+                            <input type='submit' name='update_cart' id='update_cart' class='quan' value='Update'>
+                            </form>
+                            <a href='cart.php?remove_cart=$product_id&userID=$userID' class='btn btn-info mx-1'>Remove</a>
+                            <a href='product_details.php?product_id=$product_id' class='btn btn-secondary'>View Details</a>
                         </div>
-                    </div>");
+                    </div>
+                </div>
+                ");
+        }
+        $total_price = array_sum($item_prices);
+        echo ("<form method='post' action='../index.php' class='text-center d-flex'>
+                            <h2 class='text-info text-center m-3'>Total price: $$total_price </h2>
+                            <input type='submit' name='countinue_shopping' id='countinue_shopping' class='bg-info px-3 py-2 border-0 m-3' value='Continue Shopping'>
+                            </form>");
+    } else {
+        echo ("<h1 class='text-center text-danger'>You don't have any items in your cart!</h1>");
+    }
+}
+
+//remove from cart
+function removeFromCart()
+{
+    if (isset($_GET['remove_cart']) and isset($_GET['userID'])) {
+        global $pdo;
+        $userID = getFormValue(INPUT_GET, 'userID', FILTER_DEFAULT);
+        $productID = getFormValue(INPUT_GET, 'remove_cart', FILTER_DEFAULT);
+        $select_query = "DELETE from cart where user_id = :userID and product_id = :productID";
+        $stmt = $pdo->prepare($select_query);
+        $stmt->bindParam(':userID', $userID);
+        $stmt->bindParam(':productID', $productID);
+        $stmt->execute();
+    }
+}
+
+function updateQuantityInCart()
+{
+    if (isset($_POST['update_cart'])) {
+        global $pdo;
+        $userID = getFormValue(INPUT_GET, 'userID', FILTER_VALIDATE_INT);
+        $productID = getFormValue(INPUT_GET, 'productID', FILTER_VALIDATE_INT);
+        $quantity = getFormValue(INPUT_POST, 'quantity', FILTER_VALIDATE_INT);
+        $available = $_SESSION['quantity'];
+        if ($quantity > $available) {
+            echo "<script>alert('Total available items is $available. Please select lesser value')</script>";
+        } else {
+            $update_query = "UPDATE cart set cart_quantity=:quantity where user_id=:userID and product_id=:productID";
+            $update = $pdo->prepare($update_query);
+            $update->bindParam(':quantity', $quantity);
+            $update->bindParam(':userID', $userID);
+            $update->bindParam(':productID', $productID);
+            $update->execute();
+            echo "<script>window.open('cart.php', '_self')</script>";
         }
     }
 }
