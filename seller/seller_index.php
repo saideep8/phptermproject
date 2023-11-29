@@ -2,6 +2,13 @@
 session_start();
 include('../config/pdo.php');
 include('../functions/common_functions.php');
+
+if (!isset($_SESSION['register_as']) || $_SESSION['register_as'] !== 'Seller') {
+    echo "<script>alert('Please login as a seller')</script>";
+    echo "<script>window.open('../view/logout.php', '_self')</script>";
+    exit();
+}
+
 ?>
 
 <!DOCTYPE html>

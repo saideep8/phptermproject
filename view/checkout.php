@@ -1,8 +1,11 @@
 <?php
+
 session_start();
-include('./config/pdo.php');
-include('./functions/common_functions.php');
+include('../config/pdo.php');
+include('../functions/common_functions.php');
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,70 +23,94 @@ include('./functions/common_functions.php');
 </head>
 
 <body>
-    <!-- Navigation bar -->
-    <div class="container-fluid p-0">
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-info">
-            <div class="container-fluid">
-                <img src="../images/dukhan.png" alt="" class="logo">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <section class="h-100 h-custom" style="background-color: white;">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body p-4">
 
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Products</a>
-                        </li>
-                        <!-- <li class="nav-item">
-                            <a class="nav-link" href="cart.php"><i class="fa-solid fa-cart-shopping"></i><sup></sup></a>
-                        </li> -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="registration.php">Login/Register</a>
-                        </li>
+                            <div class="row">
 
-                    </ul>
-                    <form class="d-flex" action="index.php" method="get">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search_data">
-                        <input class="btn btn-outline-light" value="Search" type="submit" name="search_data_product">
-                    </form>
+                                <div class="col-lg-7">
+                                    <h5 class="mb-3"><a href="../index.php" class="text-body"><i class="fas fa-long-arrow-alt-left me-2"></i>Continue shopping</a></h5>
+                                    <hr>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div>
+                                            <p class="mb-1">Shopping cart</p>
+                                            <p class="mb-0">You have <?php cartNumber(); ?> items in your cart</p>
+                                        </div>
+
+                                    </div>
+
+                                    <?php
+                                    getCheckoutItems();
+                                    ?>
+                                </div>
+                                <div class="col-lg-5">
+
+                                    <div class="card bg-primary text-white rounded-3">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                                <h5 class="mb-0">Card details</h5>
+                                            </div>
+
+                                            <form action="payment.php" method="post" class="mt-4">
+                                                <div class="form-outline form-white mb-4">
+                                                    <input type="text" id="cardholder" name="cardholder" class="form-control form-control-lg" siez="17" placeholder="Cardholder's Name" required />
+                                                    <label class="form-label" for="cardholder">Cardholder's Name</label>
+                                                </div>
+
+                                                <div class="form-outline form-white mb-4">
+                                                    <input type="tel" id="cardnumber" name="cardnumber" class="form-control form-control-lg" siez="17" placeholder="Enter your card number" pattern="[0-9\s]{1,16}" minlength="16" maxlength="16" required />
+                                                    <label class="form-label" for="cardnumber">Card Number</label>
+                                                </div>
+
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <div class="form-outline form-white">
+                                                            <input type="tel" id="expirydate" name="expirydate" class="form-control form-control-lg" placeholder="MMYYYY" size="1" id="exp" minlength="6" maxlength="6" pattern="[0-9\s]{1,6}" required />
+                                                            <label class="form-label" for="expirydate">Expiry date</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-outline form-white">
+                                                            <input type="tel" id="cvv" name="cvv" class="form-control form-control-lg" placeholder="&#9679;&#9679;&#9679;" minlength="3" maxlength="3" pattern="[0-9\s]{1,6}" required />
+                                                            <label class="form-label" for="cvv">CVV</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <hr class="my-4">
+
+                                                <div class="d-flex justify-content-between">
+                                                    <p class="mb-2">Subtotal</p>
+                                                    <p class="mb-2">$<?php echo ($_SESSION['total_price']); ?></p>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <p class="mb-2">Total(Incl. taxes)</p>
+                                                    <p class="mb-2">$<?php echo ($_SESSION['total_price']); ?> </p>
+                                                </div>
+                                                <input type="submit" name="payment" id="payment" class="btn btn-info btn-block btn-lg" value="Proceed to payment">
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
-        </nav>
-
-        <nav class="navbar navbar-expand-lg navbar-light bg-secondary">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Welcome Guest</a>
-                </li>
-            </ul>
-        </nav>
-
-        <div class="bg-light p-1">
-            <h3 class="text-center">Shop with Dukhan.</h3>
-            <p class="text-center">Hassle free!</p>
         </div>
-    </div>
-
-    <div class="row px-1">
-        <div class="col-md-12">
-            <div class="row">
-                <!-- php code -->
-                <?php
-                unset($_SESSION['user_id']);
-                if (isset($_SESSION['user_id'])) {
-                    echo "inside...";
-                    echo $_SESSION['user_id'];
-                } else {
-                    include('login.php');
-                }
-                ?>
-            </div>
-        </div>
-    </div>
+    </section>
 
     <!-- bootstrap js link -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>

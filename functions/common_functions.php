@@ -1,11 +1,5 @@
 <?php
-
-//function to unset session variables
-function handleLoginLogoutClick()
-{
-    session_unset();
-    session_destroy();
-}
+include('../config/pdo.php');
 
 //function to update welcome message 
 function updateWelcomeMessage()
@@ -47,7 +41,6 @@ function getProducts()
         $select_query = "SELECT * from products order by rand() LIMIT 0,12";
         $stmt = $pdo->query($select_query);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $userID = $_SESSION['user_id'];
             $product_id = $row['product_id'];
             $product_name = $row['product_name'];
             $product_description = $row['product_description'];
@@ -60,7 +53,7 @@ function getProducts()
                             <h5 class='card-title'>$product_name</h5>
                             <p class='card-text'>$product_description</p>
                             <p class='card-text'>Price: $$price</p>
-                            <a href='./view/cart.php?cart=$product_id' class='btn btn-info'>Add to cart</a>
+                            <a href='./view/cart.php?cart=$product_id' class='btn btn-secondary'>Add to cart</a>
                             <a href='./view/product_details.php?product_id=$product_id' class='btn btn-secondary'>View Details</a>
                         </div>
                     </div>
@@ -97,7 +90,7 @@ function getSearchProducts()
                                 <h5 class='card-title'>$product_name</h5>
                                 <p class='card-text'>$product_description</p>
                                 <p class='card-text'>Price: $$price</p>
-                                <a href='./view/cart.php?cart=$product_id' class='btn btn-info'>Add to cart</a>
+                                <a href='./view/cart.php?cart=$product_id' class='btn btn-secondary'>Add to cart</a>
                                 <a href='./view/product_details.php?product_id=$product_id' class='btn btn-secondary'>View Details</a>
                             </div>
                         </div>
@@ -120,7 +113,6 @@ function getProductDetails()
         $stmt->bindParam(':product_id', $product_id);
         $stmt->execute();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $userID = $_SESSION['user_id'];
             $product_id = $row['product_id'];
             $product_name = $row['product_name'];
             $product_description = $row['product_description'];
@@ -193,8 +185,6 @@ function addProductToCart()
             if (sizeof($row) > 0) {
                 echo "<script>alert('This item is already in the cart')</script>";
                 echo "<script>window.open('../index.php', '_self')</script>";
-                // return;
-                // echo ("<p>This product is already in the cart</p>");
             } else {
                 $insertStmt = "INSERT into cart (user_id, product_id) values ($userID, $product_id)";
                 $stmt = $pdo->prepare($insertStmt);
@@ -205,9 +195,6 @@ function addProductToCart()
         } else {
             echo "<script>alert('Please login to add items into the cart.')</script>";
             echo "<script>window.open('login.php', '_self')</script>";
-
-            // header('Location: login.php');
-            // exit();
         }
     }
 }
@@ -254,7 +241,6 @@ function getCartItems()
                 $price = $quantity * $res['price'];
                 $item_prices[] = $price;
                 $_SESSION['quantity'] = $res['quantity'];
-                $available = $_SESSION['quantity'] + 1;
                 echo ("
         <div class='col-md-3 mb-2'>
                     <div class='card'>
@@ -276,6 +262,7 @@ function getCartItems()
                 ");
             }
             $total_price = array_sum($item_prices);
+            $_SESSION['total_price'] = $total_price;
             echo ("<form method='post' action='../index.php' class='text-center d-flex'>
                             <h2 class='text-info text-center m-3'>Total price: $$total_price </h2>
                             <input type='submit' name='countinue_shopping' id='countinue_shopping' class='bg-info px-3 py-2 border-0 m-3' value='Continue Shopping'>
@@ -285,7 +272,8 @@ function getCartItems()
             echo ("<h1 class='text-center text-danger'>You don't have any items in your cart!</h1>");
         }
     } else {
-        include('../view/login.php');
+        echo "<script>alert('Please login to access the cart.')</script>";
+        echo "<script>window.open('login.php', '_self')</script>";
     }
 }
 
@@ -301,6 +289,8 @@ function removeFromCart()
         $stmt->bindParam(':userID', $userID);
         $stmt->bindParam(':productID', $productID);
         $stmt->execute();
+        header('Location: cart.php');
+        exit();
     }
 }
 
@@ -323,5 +313,65 @@ function updateQuantityInCart()
             $update->execute();
             echo "<script>window.open('cart.php', '_self')</script>";
         }
+    }
+}
+
+function getCheckoutItems()
+{
+    if (isset($_SESSION['user_id'])) {
+        global $pdo;
+        $userID = $_SESSION['user_id'];
+        $item_prices = [];
+        $select_query = "SELECT product_id, cart_quantity from cart where user_id = :userID";
+        $stmt = $pdo->prepare($select_query);
+        $stmt->bindParam(':userID', $userID);
+        $stmt->execute();
+        $count = $stmt->rowCount();
+        if ($count > 0) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $product_id = $row['product_id'];
+                $quantity = $row['cart_quantity'];
+                $item_query = "SELECT * from products where product_id = :product_id";
+                $itemstmt = $pdo->prepare($item_query);
+                $itemstmt->bindParam(':product_id', $product_id);
+                $itemstmt->execute();
+                $res = $itemstmt->fetch(PDO::FETCH_ASSOC);
+                $product_name = $res['product_name'];
+                $product_description = $res['product_description'];
+                $img = $res['image'];
+                $price = $quantity * $res['price'];
+                $item_prices[] = $price;
+                $_SESSION['quantity'] = $res['quantity'];
+                echo ("<div class='card mb-3'>
+                                        <div class='card-body'>
+                                            <div class='d-flex justify-content-between'>
+                                                <div class='d-flex flex-row align-items-center'>
+                                                    <div>
+                                                        <img src='../images/product_images/$img' class='img-fluid rounded-3' alt='Shopping item' style='width: 65px;'>
+                                                    </div>
+                                                    <div class='ms-3'>
+                                                        <h5>$product_name</h5>
+                                                        <p class='small mb-0'>$product_description</p>
+                                                    </div>
+                                                </div>
+                                                <div class='d-flex flex-row align-items-center'>
+                                                    <div style='width: 50px;'>
+                                                        <h5 class='fw-normal mb-0'>$quantity</h5>
+                                                    </div>
+                                                    <div style='width: 80px;'>
+                                                        <h5 class='mb-0'>$$price</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>");
+            }
+            $total_price = array_sum($item_prices);
+            $_SESSION['total_price'] = $total_price;
+        } else {
+        }
+    } else {
+        echo "<script>alert('Please login to access the checkout page.')</script>";
+        echo "<script>window.open('login.php', '_self')</script>";
     }
 }

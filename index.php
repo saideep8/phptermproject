@@ -2,6 +2,14 @@
 session_start();
 include('./config/pdo.php');
 include('./functions/common_functions.php');
+
+if (isset($_SESSION['register_as']) && $_SESSION['register_as'] === 'Seller') {
+    session_unset();
+    session_destroy();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

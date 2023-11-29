@@ -41,7 +41,7 @@ include('../functions/common_functions.php');
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            <a class="nav-link active" aria-current="page" href="../index.php">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Products</a>
@@ -50,7 +50,7 @@ include('../functions/common_functions.php');
                             <a class="nav-link" href="cart.php"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? './view/logout.php' : './view/login.php'; ?>">
+                            <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? 'logout.php' : 'login.php'; ?>">
                                 <?php
                                 updateLoginLogout();
                                 ?>
@@ -84,25 +84,6 @@ include('../functions/common_functions.php');
             <p class="text-center">Hassle free!</p>
         </div>
     </div>
-
-    <!-- <div class="row px-1">
-        <div class="col-md-12">
-            <div class="row">
-
-                <div class="col-md-12">
-                    <div class='card position-absolute top-30 start-40'>
-                        <img src='../images/product_images/apple.jpeg' class='card-img-top' alt='$product_name'>
-                        <div class='card-body'>
-                            <h5 class='card-title'>$product_name</h5>
-                            <p class='card-text'>$product_description</p>
-                            <p class='card-text'>Price: $$price</p>
-                            <a href='#' class='btn btn-info'>Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
     <?php
     getProductDetails();
     ?>

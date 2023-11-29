@@ -40,7 +40,7 @@ include('../functions/common_functions.php');
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            <a class="nav-link active" aria-current="page" href="../index.php">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Products</a>
@@ -49,7 +49,7 @@ include('../functions/common_functions.php');
                             <a class="nav-link" href="#"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? './view/logout.php' : './view/login.php'; ?>">
+                            <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? 'logout.php' : 'login.php'; ?>">
                                 <?php
                                 updateLoginLogout();
                                 ?>

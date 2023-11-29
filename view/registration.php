@@ -107,7 +107,7 @@ if (isset($_POST['user_register'])) {
 
                     <div class="form-outline mb-4">
                         <label for="register_as" class="form-label">Register As</label>
-                        <select id="register_as" name="register_as" class="form-control"  required>
+                        <select id="register_as" name="register_as" class="form-control" required>
                             <option value="" selected disabled>Select an option</option>
                             <option value="Customer">Customer</option>
                             <option value="Seller">Seller</option>
