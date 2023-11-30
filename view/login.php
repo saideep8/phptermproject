@@ -4,6 +4,18 @@ session_start();
 include('../config/pdo.php');
 include('../functions/common_functions.php');
 
+//function to increment login count
+function incrementLoginCount()
+{
+    if (isset($_COOKIE["login_count_" . $_SESSION['user_id']])) {
+        $loginCount =  $_COOKIE["login_count_" . $_SESSION['user_id']];
+    } else {
+        $loginCount = 0;
+    }
+    $loginCount++;
+    setcookie("login_count_" . $_SESSION['user_id'], $loginCount, 0, "/");
+}
+
 if (isset($_POST['user_login'])) {
     $email = getFormValue(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $password = getFormValue(INPUT_POST, 'password', FILTER_DEFAULT);
@@ -21,7 +33,7 @@ if (isset($_POST['user_login'])) {
             $_SESSION['firstname'] = $user_data['firstname'];
             $_SESSION['lastname'] = $user_data['lastname'];
             $_SESSION['register_as'] = $user_data['register_as'];
-
+            incrementLoginCount();
             if ($_SESSION['register_as'] === "Customer") {
                 header("Location: ../index.php");
             } else {

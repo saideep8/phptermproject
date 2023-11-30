@@ -1,5 +1,7 @@
 <?php
-require_once "pdo.php";
+include('pdo.php');
+include('../functions/common_functions.php');
+
 header('Content-Type: application/json; charset=utf-8');
 
 if (isset($_GET['email'])) {

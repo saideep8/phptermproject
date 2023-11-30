@@ -1,5 +1,7 @@
 <?php
-require_once "../config/pdo.php";
+include("../config/pdo.php");
+include('../functions/common_functions.php');
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     $productId = getFormValue(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -24,6 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     header("Location: ../seller/seller_index.php");
     exit();
 } else {
-    header("Location: ../seller/seller_index.php#view-products");
+    header("Location: ../seller/seller_index.php");
     exit();
 }

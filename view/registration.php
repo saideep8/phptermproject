@@ -15,28 +15,32 @@ if (isset($_POST['user_register'])) {
     $register_as = getFormValue(INPUT_POST, 'register_as', FILTER_DEFAULT);
 
     // Validate email format
-    if (!$email) {
+    if ($firstname == '' or $lastname == '' or $password == '' or $confirm_password == '' or $contact == '' or $register_as == '') {
+        $_SESSION['input_message'] = 'Please fill all the fields!';
+    } else if (!$email) {
         $_SESSION['input_message'] = 'Please enter a valid email address.';
-        header("Location: registration.php");
-        exit();
     } else if ($password !== $confirm_password) {
         $_SESSION['input_message'] = 'Password and Confirm Password do not match!';
     } else {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $insert_query = "INSERT INTO users (firstname, lastname, email, password, contact, register_as) 
-                        VALUES (:firstname, :lastname, :email, :password, :contact, :register_as)";
-        $insert_stmt = $pdo->prepare($insert_query);
-        $insert_stmt->bindParam(':firstname', $firstname);
-        $insert_stmt->bindParam(':lastname', $lastname);
-        $insert_stmt->bindParam(':email', $email);
-        $insert_stmt->bindParam(':password', $hashed_password);
-        $insert_stmt->bindParam(':contact', $contact);
-        $insert_stmt->bindParam(':register_as', $register_as);
-        $query_result = $insert_stmt->execute();
-        if ($query_result) {
-            $_SESSION['input_message'] = 'User registered successfully!';
+        if (isset($_SESSION['email_exists']) && $_SESSION['email_exists'] == true) {
+            $_SESSION['input_message'] = 'Email already exists.';
         } else {
-            $_SESSION['input_message'] = 'Error registering user. Please try again.';
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $insert_query = "INSERT INTO users (firstname, lastname, email, password, contact, register_as) 
+                        VALUES (:firstname, :lastname, :email, :password, :contact, :register_as)";
+            $insert_stmt = $pdo->prepare($insert_query);
+            $insert_stmt->bindParam(':firstname', $firstname);
+            $insert_stmt->bindParam(':lastname', $lastname);
+            $insert_stmt->bindParam(':email', $email);
+            $insert_stmt->bindParam(':password', $hashed_password);
+            $insert_stmt->bindParam(':contact', $contact);
+            $insert_stmt->bindParam(':register_as', $register_as);
+            $query_result = $insert_stmt->execute();
+            if ($query_result) {
+                $_SESSION['input_message'] = 'User registered successfully!';
+            } else {
+                $_SESSION['input_message'] = 'Error registering user. Please try again.';
+            }
         }
     }
     header("Location: registration.php");
@@ -67,7 +71,7 @@ if (isset($_POST['user_register'])) {
             } else {
                 $class = 'text-center text-danger';
             }
-            echo ("<p class='" . $class . "' >" . $message . "</p>");
+            echo ("<h4 class='" . $class . "' >" . $message . "</h4>");
             unset($_SESSION['input_message']);
         }
         ?>
@@ -86,7 +90,7 @@ if (isset($_POST['user_register'])) {
 
                     <div class="form-outline mb-4">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" name="email" class="form-control" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="Enter Your Email" autocomplete="off" required />
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter Your Email" autocomplete="off" required />
                         <p id="emailMsg"></p>
                     </div>
 
@@ -129,21 +133,27 @@ if (isset($_POST['user_register'])) {
 </html>
 
 <!-- Javascript code to validate email is exisiting user or new -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#email').on('blur', function() {
-            event.preventDefault();
-            var email = $(this).val();
-            if (email.trim() !== "") {
-                $.getJSON('../config/getjson.php', {
-                    email: email
-                }, function(data) {
-                    if (data.email_exists) {
-                        $('#emailMsg').text('Account already exists with this email. Please use a different email').css('color', 'red').show();
-                    } else {
-                        $('#emailMsg').text('');
-                    }
-                });
+        $('#email').keydown(function(event) {
+            if (event.keyCode == 9) {
+                // $('#email').on('blur', function() {
+                event.preventDefault();
+                var email = $(this).val();
+                if (email.trim() !== "") {
+                    $.getJSON('../config/getjson.php', {
+                        email: email
+                    }, function(data) {
+                        if (data.email_exists) {
+                            $('#emailMsg').text('Account already exists with this email. Please use a different email').css('color', 'red').show();
+                            <?php $_SESSION['email_exists'] = true; ?>
+                        } else {
+                            <?php unset($_SESSION['email_exists']) ?>
+                            $('#emailMsg').text('');
+                        }
+                    });
+                }
             }
         });
     });

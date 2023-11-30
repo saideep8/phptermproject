@@ -64,6 +64,7 @@ if (!isset($_SESSION['register_as']) || $_SESSION['register_as'] !== 'Seller') {
         </nav>
         <!-- View Products Table Starts Here -->
         <div class="container mt-5">
+            <p class='msg text-center'></p>
             <tbody>
                 <?php
                 include('../config/pdo.php');
@@ -106,10 +107,13 @@ if (!isset($_SESSION['register_as']) || $_SESSION['register_as'] !== 'Seller') {
                         echo "<td>{$row['product_name']}</td>";
                         echo "<td>{$row['product_description']}</td>";
                         echo "<td>{$row['category']}</td>";
-                        echo "<td><input type='number' value='{$row['price']}' step='0.01' name='edit_price'></td>";
-                        echo "<td><input type='number' value='{$row['quantity']}' name='edit_quantity'></td>";
+                        // echo "<form action='' method='post'>";
+                        echo "<td><input type='number' value='{$row['price']}' step='0.01' min=1 name='edit_price' required></td>";
+                        echo "<td><input type='number' value='{$row['quantity']}' min=1 name='edit_quantity' required></td>";
                         echo "<td><img src='../images/product_images/{$row['image']}' alt='Product Image' style='max-width: 100px; max-height: 100px;'></td>";
+                        // echo "<td><input type='submit' value='save' class='btn btn-success save-btn'><input type='submit' value='delete' class='btn btn-danger save-btn'</td>";
                         echo "<td><button class='btn btn-success save-btn'>Save</button><button class='btn btn-danger cancel-btn'>Cancel</button></td>";
+                        // echo "</form>";
                         echo "</tr>";
                     }
                     echo "</tbody>
@@ -156,10 +160,17 @@ if (!isset($_SESSION['register_as']) || $_SESSION['register_as'] !== 'Seller') {
                         new_quantity: newQuantity
                     },
                     success: function(response) {
-                        console.log('Data updated successfully:', response);
-                        window.location.href = '../seller/seller_index.php';
-                        $('tr.edit-mode[data-product-id="' + productId + '"]').hide();
-                        $('tr.view-mode[data-product-id="' + productId + '"]').show();
+                        if (response.success) {
+                            console.log('Data updated successfully:', response);
+                            window.location.href = '../seller/seller_index.php';
+                            $('tr.edit-mode[data-product-id="' + productId + '"]').hide();
+                            $('tr.view-mode[data-product-id="' + productId + '"]').show();
+                            $('.msg').empty().hide();
+                        } else {
+                            $('.msg').text('Please enter proper values').css('color', 'red').show();
+
+                        }
+
                     },
                     error: function(error) {
                         console.error('Error updating data:', error);

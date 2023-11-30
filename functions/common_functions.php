@@ -77,7 +77,6 @@ function getSearchProducts()
             $stmt = $pdo->prepare($search_query);
             $stmt->execute();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $userID = $_SESSION['user_id'];
                 $product_id = $row['product_id'];
                 $product_name = $row['product_name'];
                 $product_description = $row['product_description'];
@@ -475,9 +474,11 @@ function getYourOrders()
                                             </div>");
             }
             unset($_SESSION['payment_id']);
+        } else {
+            echo "<h5 class='text-center text-danger'>You haven't placed any orders yet!</h5>";
         }
     } else {
-        echo "<script>alert('Please login to access the orders page.')</script>";
+        echo "<script>alert('Please login to access the Orders page.')</script>";
         echo "<script>window.open('login.php', '_self')</script>";
     }
 }
