@@ -1,7 +1,8 @@
 <?php
+
+session_start();
 include('../config/pdo.php');
 include('../functions/common_functions.php');
-session_start();
 
 if (isset($_POST['user_register'])) {
 
@@ -42,7 +43,6 @@ if (isset($_POST['user_register'])) {
     return;
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -102,7 +102,7 @@ if (isset($_POST['user_register'])) {
 
                     <div class="form-outline mb-4">
                         <label for="contact" class="form-label">Contact</label>
-                        <input type="tel" id="contact" name="contact" class="form-control" inputmode="numeric" pattern="[0-9]*" placeholder="Enter Your Mobile Number" autocomplete="off" required />
+                        <input type="tel" id="contact" name="contact" class="form-control" inputmode="numeric" pattern="[0-9]*" minlength="10" maxlength="10" placeholder="Enter Your Mobile Number" autocomplete="off" required />
                     </div>
 
                     <div class="form-outline mb-4">

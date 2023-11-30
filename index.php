@@ -41,13 +41,13 @@ if (isset($_SESSION['register_as']) && $_SESSION['register_as'] === 'Seller') {
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Products</a>
+                            <a class="nav-link" href="#">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="./view/cart.php"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./view/orders.php">Your orders</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? './view/logout.php' : './view/login.php'; ?>">
@@ -59,6 +59,7 @@ if (isset($_SESSION['register_as']) && $_SESSION['register_as'] === 'Seller') {
 
                     </ul>
                     <form class="d-flex" action="index.php" method="get">
+
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search_data">
                         <input class="btn btn-outline-light" value="Search" type="submit" name="search_data_product">
                     </form>

@@ -68,7 +68,7 @@ if (isset($_POST['payment']) && isset($_SESSION['user_id'])) {
                                         </div>
                                         <div class="d-flex flex-column">
                                             <p class="mb-1 small text-primary">Total amount due</p>
-                                            <h6 class="mb-0 text-primary"><?php echo $_SESSION['total_price'] ?></h6>
+                                            <h6 class="mb-0 text-primary">$<?php echo $_SESSION['total_price'] ?></h6>
                                         </div>
                                     </div>
                                 </div>
@@ -77,7 +77,7 @@ if (isset($_POST['payment']) && isset($_SESSION['user_id'])) {
                             <div class="d-flex justify-content-between align-items-center pb-1">
                                 <a href="checkout.php" class="text-muted">Go back</a>
                                 <form action="order_confirmation.php" method="post">
-                                    <input type="submit" class="btn btn-primary btn-lg" value="Pay amount">
+                                    <input type="submit" name="pay_amount" id="pay_amount" class="btn btn-primary btn-lg" value="Pay amount">
                                 </form>
                             </div>
                         </div>

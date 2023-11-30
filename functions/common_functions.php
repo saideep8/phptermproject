@@ -375,3 +375,109 @@ function getCheckoutItems()
         echo "<script>window.open('login.php', '_self')</script>";
     }
 }
+
+function getLastOrderedItems()
+{
+    if (isset($_SESSION['user_id'])) {
+        global $pdo;
+        $payment_id = $_SESSION['payment_id'];
+        $select_query = "SELECT * FROM `orders`
+         JOIN products ON orders.product_id = products.product_id
+          JOIN payments on orders.pay_id = payments.payment_id
+           WHERE orders.pay_id = :payment_id;";
+        $stmt = $pdo->prepare($select_query);
+        $stmt->bindParam(':payment_id', $payment_id);
+        $stmt->execute();
+        $count = $stmt->rowCount();
+        if ($count > 0) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $quantity = $row['order_quantity'];
+                $product_name = $row['product_name'];
+                $product_description = $row['product_description'];
+                $img = $row['image'];
+                $price = $row['price'];
+                $item_total_price = $quantity * $price;
+                echo ("<div class='card mb-3'>
+                                                <div class='card-body'>
+                                                    <div class='d-flex justify-content-between'>
+                                                        <div class='d-flex flex-row align-items-center'>
+                                                            <div>
+                                                                <img src='../images/product_images/$img' class='img-fluid rounded-3' alt='Shopping item' style='width: 65px;'>
+                                                            </div>
+                                                            <div class='ms-3'>
+                                                                <h5>$product_name</h5>
+                                                                <p class='small mb-0'>$product_description</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class='d-flex flex-row align-items-center'>
+                                                            <div style='width: 50px;'>
+                                                                <h5 class='fw-normal mb-0'>$quantity</h5>
+                                                            </div>
+                                                            <div style='width: 80px;'>
+                                                                <h5 class='mb-0'>$$item_total_price</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>");
+            }
+            unset($_SESSION['payment_id']);
+        }
+    } else {
+        echo "<script>alert('Please login to access the checkout page.')</script>";
+        echo "<script>window.open('login.php', '_self')</script>";
+    }
+}
+
+function getYourOrders()
+{
+    if (isset($_SESSION['user_id'])) {
+        global $pdo;
+        $user_id = $_SESSION['user_id'];
+        $select_query = "SELECT * FROM `orders`
+         JOIN products ON orders.product_id = products.product_id
+          JOIN payments on orders.pay_id = payments.payment_id
+           WHERE orders.user_id = :user_id order by orders.order_date asc;";
+        $stmt = $pdo->prepare($select_query);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        $count = $stmt->rowCount();
+        if ($count > 0) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $quantity = $row['order_quantity'];
+                $product_name = $row['product_name'];
+                $product_description = $row['product_description'];
+                $img = $row['image'];
+                $price = $row['price'];
+                $item_total_price = $quantity * $price;
+                echo ("<div class='card mb-3'>
+                                                <div class='card-body'>
+                                                    <div class='d-flex justify-content-between'>
+                                                        <div class='d-flex flex-row align-items-center'>
+                                                            <div>
+                                                                <img src='../images/product_images/$img' class='img-fluid rounded-3' alt='Shopping item' style='width: 65px;'>
+                                                            </div>
+                                                            <div class='ms-3'>
+                                                                <h5>$product_name</h5>
+                                                                <p class='small mb-0'>$product_description</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class='d-flex flex-row align-items-center'>
+                                                            <div style='width: 50px;'>
+                                                                <h5 class='fw-normal mb-0'>$quantity</h5>
+                                                            </div>
+                                                            <div style='width: 80px;'>
+                                                                <h5 class='mb-0'>$$item_total_price</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>");
+            }
+            unset($_SESSION['payment_id']);
+        }
+    } else {
+        echo "<script>alert('Please login to access the orders page.')</script>";
+        echo "<script>window.open('login.php', '_self')</script>";
+    }
+}

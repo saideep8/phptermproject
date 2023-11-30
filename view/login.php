@@ -1,7 +1,8 @@
 <?php
+
+session_start();
 include('../config/pdo.php');
 include('../functions/common_functions.php');
-session_start();
 
 if (isset($_POST['user_login'])) {
     $email = getFormValue(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
@@ -26,7 +27,7 @@ if (isset($_POST['user_login'])) {
             } else {
                 header("Location: ../seller/seller_index.php");
             }
-
+            $_SESSION['login_message'] = 'Logged in successfully';
             exit();
         } else {
             $_SESSION['login_message'] = 'Incorrect password. Please try again.';
@@ -54,6 +55,18 @@ if (isset($_POST['user_login'])) {
 <body>
     <div class="container-fluid">
         <h2 class="text-center">User Login</h2>
+        <?php
+        if (isset($_SESSION['login_message'])) {
+            $message = $_SESSION['login_message'];
+            if (strpos($message, 'successfully')) {
+                $class = 'text-center text-success';
+            } else {
+                $class = 'text-center text-danger';
+            }
+            echo ("<p class='" . $class . "' >" . $message . "</p>");
+            unset($_SESSION['login_message']);
+        }
+        ?>
         <div class="row d-flex align-items-center justify-content-center">
             <div class="col-lg-12 col-xl-6">
                 <form action="" method="post" enctype="multipart/form-data">

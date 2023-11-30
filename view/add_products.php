@@ -9,7 +9,7 @@ if (isset($_POST['add_product'])) {
     $description = getFormValue(INPUT_POST, 'description', FILTER_DEFAULT);
     $keywords = getFormValue(INPUT_POST, 'keywords', FILTER_DEFAULT);
     $category = getFormValue(INPUT_POST, 'category', FILTER_DEFAULT);
-    $product_price = getFormValue(INPUT_POST, 'product_price', FILTER_VALIDATE_INT);
+    $product_price = getFormValue(INPUT_POST, 'product_price', FILTER_DEFAULT);
     $product_quantity = getFormValue(INPUT_POST, 'product_quantity', FILTER_VALIDATE_INT);
     $seller_name = getFormValue(INPUT_POST, 'seller_name', FILTER_DEFAULT);
     $seller_city = getFormValue(INPUT_POST, 'seller_city', FILTER_DEFAULT);
@@ -33,28 +33,28 @@ if (isset($_POST['add_product'])) {
 
         if (in_array($file_actual_ext, $allowed)) {
             move_uploaded_file($product_image_tmpname, $file_destination);
+            //add products into database
+            $add_products_query = "INSERT into products (product_name, product_description, product_keywords, category, price, image, seller_name, city, country, quantity, seller_id) 
+            VALUES 
+            (:product_name, :product_description, :product_keywords, :category, :price, :image, :seller_name, :city, :country, :quantity, :seller_id)";
+            $insert_stmt = $pdo->prepare($add_products_query);
+            $insert_stmt->bindParam(':product_name', $product_name);
+            $insert_stmt->bindParam(':product_description', $description);
+            $insert_stmt->bindParam(':product_keywords', $keywords);
+            $insert_stmt->bindParam(':category', $category);
+            $insert_stmt->bindParam(':price', $product_price);
+            $insert_stmt->bindParam(':image', $product_image_name);
+            $insert_stmt->bindParam(':seller_name', $seller_name);
+            $insert_stmt->bindParam(':city', $seller_city);
+            $insert_stmt->bindParam(':country', $seller_country);
+            $insert_stmt->bindParam(':quantity', $product_quantity);
+            $insert_stmt->bindParam(':seller_id', $_SESSION['user_id']);
+            $query_result = $insert_stmt->execute();
+            if ($query_result == true) {
+                $_SESSION['input_message'] = 'Product is successfully added into the database!';
+            }
         } else {
             $_SESSION['input_message'] = 'Please upload file in jpg/jpeg or png format.';
-        }
-
-        //add products into database
-        $add_products_query = "INSERT into products (product_name, product_description, product_keywords, category, price, image, seller_name, city, country, quantity) 
-        VALUES 
-        (:product_name, :product_description, :product_keywords, :category, :price, :image, :seller_name, :city, :country, :quantity)";
-        $insert_stmt = $pdo->prepare($add_products_query);
-        $insert_stmt->bindParam(':product_name', $product_name);
-        $insert_stmt->bindParam(':product_description', $description);
-        $insert_stmt->bindParam(':product_keywords', $keywords);
-        $insert_stmt->bindParam(':category', $category);
-        $insert_stmt->bindParam(':price', $product_price);
-        $insert_stmt->bindParam(':image', $product_image_name);
-        $insert_stmt->bindParam(':seller_name', $seller_name);
-        $insert_stmt->bindParam(':city', $seller_city);
-        $insert_stmt->bindParam(':country', $seller_country);
-        $insert_stmt->bindParam(':quantity', $product_quantity);
-        $query_result = $insert_stmt->execute();
-        if ($query_result == true) {
-            $_SESSION['input_message'] = 'Product is successfully added into the database!';
         }
     }
     header("Location: add_products.php");
@@ -78,8 +78,8 @@ if (isset($_POST['add_product'])) {
 </head>
 
 <body class="bg-light">
-
     <div class="container mt-3">
+        <a href="../seller/seller_index.php" class="btn btn-info mb-3">Go Back</a>
         <h1 class="text-center">Add Products</h1>
 
         <?php
@@ -123,7 +123,7 @@ if (isset($_POST['add_product'])) {
             <!-- price -->
             <div class="form-outline mb-4 w-50 m-auto">
                 <label for="product_price" class="form-label">Price</label>
-                <input type="number" name="product_price" id="product_price" class="form-control" placeholder="Enter product price" min=1 autocomplete="off" required>
+                <input type="number" name="product_price" id="product_price" class="form-control" placeholder="Enter product price" step="0.01" min=1 autocomplete="off" required>
             </div>
 
             <!-- quantity -->

@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 include('../config/pdo.php');
 include('../functions/common_functions.php');
@@ -44,10 +45,10 @@ include('../functions/common_functions.php');
                             <a class="nav-link active" aria-current="page" href="../index.php">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Products</a>
+                            <a class="nav-link" href="cart.php"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="cart.php"><i class="fa-solid fa-cart-shopping"></i><sup><?php cartNumber(); ?></sup></a>
+                            <a class="nav-link" href="orders.php">Your orders</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo isset($_SESSION['firstname']) ? 'logout.php' : 'login.php'; ?>">
