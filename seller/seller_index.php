@@ -107,13 +107,10 @@ if (!isset($_SESSION['register_as']) || $_SESSION['register_as'] !== 'Seller') {
                         echo "<td>{$row['product_name']}</td>";
                         echo "<td>{$row['product_description']}</td>";
                         echo "<td>{$row['category']}</td>";
-                        // echo "<form action='' method='post'>";
                         echo "<td><input type='number' value='{$row['price']}' step='0.01' min=1 name='edit_price' required></td>";
                         echo "<td><input type='number' value='{$row['quantity']}' min=1 name='edit_quantity' required></td>";
                         echo "<td><img src='../images/product_images/{$row['image']}' alt='Product Image' style='max-width: 100px; max-height: 100px;'></td>";
-                        // echo "<td><input type='submit' value='save' class='btn btn-success save-btn'><input type='submit' value='delete' class='btn btn-danger save-btn'</td>";
                         echo "<td><button class='btn btn-success save-btn'>Save</button><button class='btn btn-danger cancel-btn'>Cancel</button></td>";
-                        // echo "</form>";
                         echo "</tr>";
                     }
                     echo "</tbody>

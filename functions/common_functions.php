@@ -38,7 +38,7 @@ function getProducts()
 {
     if (!isset($_GET['search_data_product'])) {
         global $pdo;
-        $select_query = "SELECT * from products order by rand() LIMIT 0,12";
+        $select_query = "SELECT * from products order by rand()";
         $stmt = $pdo->query($select_query);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $product_id = $row['product_id'];

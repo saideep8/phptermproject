@@ -136,24 +136,21 @@ if (isset($_POST['user_register'])) {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#email').keydown(function(event) {
-            if (event.keyCode == 9) {
-                // $('#email').on('blur', function() {
-                event.preventDefault();
-                var email = $(this).val();
-                if (email.trim() !== "") {
-                    $.getJSON('../config/getjson.php', {
-                        email: email
-                    }, function(data) {
-                        if (data.email_exists) {
-                            $('#emailMsg').text('Account already exists with this email. Please use a different email').css('color', 'red').show();
-                            <?php $_SESSION['email_exists'] = true; ?>
-                        } else {
-                            <?php unset($_SESSION['email_exists']) ?>
-                            $('#emailMsg').text('');
-                        }
-                    });
-                }
+        $('#email').on('blur', function() {
+            event.preventDefault();
+            var email = $(this).val();
+            if (email.trim() !== "") {
+                $.getJSON('../config/getjson.php', {
+                    email: email
+                }, function(data) {
+                    if (data.email_exists) {
+                        $('#emailMsg').text('Account already exists with this email. Please use a different email').css('color', 'red').show();
+                        <?php $_SESSION['email_exists'] = true; ?>
+                    } else {
+                        <?php unset($_SESSION['email_exists']) ?>
+                        $('#emailMsg').empty().hide();
+                    }
+                });
             }
         });
     });
