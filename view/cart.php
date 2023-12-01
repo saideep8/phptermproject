@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../config/pdo.php');
+include('./config/pdo.php');
 include('../functions/common_functions.php');
 ?>
 <!DOCTYPE html>
