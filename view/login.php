@@ -13,7 +13,7 @@ function incrementLoginCount()
         $loginCount = 0;
     }
     $loginCount++;
-    setcookie("login_count_" . $_SESSION['user_id'], $loginCount, 0, "/");
+    setcookie("login_count_" . $_SESSION['user_id'], $loginCount, 86400, "/");
 }
 
 if (isset($_POST['user_login'])) {
